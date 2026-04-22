@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <conio.h> 
 using namespace std;
 //check empty lines 
 		bool is_blank(const string& s) {
@@ -13,8 +14,26 @@ using namespace std;
         return isspace(ch);
     });
 }
-//////////////////
+//////////////////Prototypes
+// Password Input  Function 
+void inputPassword(string &password);
+// register user function
+void registerUser();
+// load users from file to vector
+void load();
 
+// User Class
+class User{
+	public:
+	string name;
+	string password;
+};
+
+// users array
+vector <User> users;
+
+// save user to file function
+void save();
 
 // Class Employe Starts here--------------------------------------
 class Employee{
@@ -276,4 +295,111 @@ int main(){
                 cout << "\nInvalid choice!";
         }
     }
+}
+
+//Password Function
+void inputPassword(string &password) {
+    char ch;
+    password.clear();  // clear previous data
+
+    cout << "\nEnter Password (masking enabled): ";
+
+    while (true) {
+        ch = _getch();
+
+        if (ch == 13) { // Enter
+            break;
+        }
+        else if (ch == 8) { // Backspace
+            if (!password.empty()) {
+                password.pop_back();
+                cout << "\b \b";
+            }
+        }
+        else {
+            password.push_back(ch);
+            cout << "*";
+        }
+    }
+
+    cout << endl;
+}
+
+// save user to file
+void save(){
+	ofstream loginFile("login.txt");
+	if(!loginFile.is_open()){
+		return;
+	}
+	for( const auto &user: users){
+		loginFile << user.name  << "|" << user.password << endl;
+	}
+	loginFile.close();
+}
+
+//Register user
+void registerUser() {
+    User u;  // ? create object first
+
+    cout << "\n************************************* Register a new User.. ************************************************\n";
+	string name;
+	
+    while(true){	
+    bool exists = false;
+    cout << "\nEnter Username: ";
+    getline(cin >> ws, name);   // input into object
+    for(const User &user : users){
+    	if(name == user.name){
+    		cout << "User already exists!...." <<endl;
+			exists = true;
+			break;
+		}
+		
+	}
+	if(exists){
+		continue;
+	}else{
+			u.name = name;
+			break;}
+}
+
+    inputPassword(u.password);    // input password
+
+    users.push_back(u);           // ? store in vector
+    cout << "\n-------------Registration Successful!------------------------------\n\n";
+ 	save()   ;
+}
+
+// load users from file to vector
+void load() {
+    ifstream file("login.txt");
+    if (!file.is_open()) {
+        return;
+    }
+
+    users.clear();
+
+    string line;
+    string username;
+    string pass;
+
+    while (getline(file, line)) {
+    		if(is_blank(line)){
+				continue;
+			}
+			stringstream ss(line);
+			getline(ss, username, '|');
+			getline(ss, pass, '|');
+        User u;
+        u.name = username;
+        u.password = pass;
+		if((!u.name.empty()) && (!u.password.empty())){
+			users.push_back(u);
+		}else{
+			continue;
+		}
+        
+    }
+
+    file.close();
 }
