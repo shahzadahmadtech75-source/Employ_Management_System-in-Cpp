@@ -1,0 +1,6 @@
+Haroon Khan | 222 | 200000
+Faisal Khan | 333 | 300000
+Junaid Khan | 444 | 400000
+Sohail Majid | 666 | 150000
+Kamran Ullah | 888 | 800000
+Shahzad Ahmad | 111 | 100000
