@@ -21,7 +21,10 @@ void inputPassword(string &password);
 void registerUser();
 // load users from file to vector
 void load();
-
+// login User
+int login();
+// system flow function
+void system();
 // User Class
 class User{
 	public:
@@ -276,25 +279,47 @@ int menu(){
 }
 
 int main(){
-    EmployManager em;
-	em.loadData();
-    while(true){
-        int n = menu();
-
-        switch(n){
-            case 1: em.addEmployee(); break;
-            case 2: em.showEmployData(); break;
-            case 3: em.searchEmploy(); break;
-            case 4: em.deleteEmploy(); break;
-            case 5: em.updateEmploy(); break;
-            case 6:
-            	em.saveData();
-                cout << "\nThank you!\n";
-                return 0;
-            default:
-                cout << "\nInvalid choice!";
-        }
+    load();
+    while (true)
+    {        
+        cout << "                          *_______________________________________* "<<endl;
+        cout << "------------------------- | Welcome to Employee Management System | -------------------------------------------" << endl;
+        cout << "                          *---------------------------------------*"<<endl;
+        int choice;
+        cout << "1. Register" << endl;
+        cout << "2. Login" << endl;
+        cout << "3. Exit" << endl;
+        
+        cout << "Select: ";
+        cin >> choice;
+        int flag; 
+        switch (choice)
+        {
+            case 1:
+            registerUser() ;
+             system();
+            break;
+            case 2:
+            flag = login();
+                if(flag == 1){
+                    system();
+                }else{
+                    registerUser();
+                    system();
+                }
+            break;
+            case 3:
+            cout << "                          *_______________________* "<<endl;
+            cout << "------------------------- | Thanks for visiting.. | -------------------------------------------" << endl;
+            cout << "                          *-----------------------*"<<endl;
+        
+        return 0;
+    default:
+        cout << "\nInvalid Choice.. !" << endl;
+        continue;
     }
+}
+    
 }
 
 //Password Function
@@ -350,7 +375,7 @@ void registerUser() {
     getline(cin >> ws, name);   // input into object
     for(const User &user : users){
     	if(name == user.name){
-    		cout << "User already exists!...." <<endl;
+    		cout << "\nUser already exists!...." <<endl;
 			exists = true;
 			break;
 		}
@@ -366,7 +391,10 @@ void registerUser() {
     inputPassword(u.password);    // input password
 
     users.push_back(u);           // ? store in vector
-    cout << "\n-------------Registration Successful!------------------------------\n\n";
+     cout << "                             *_______________________________* "<<endl;
+        cout << "------------------------- | User Registered Successfully! | ------------------------------------" << endl;
+        cout << "                          *-------------------------------*"<<endl;
+    
  	save()   ;
 }
 
@@ -403,3 +431,55 @@ void load() {
 
     file.close();
 }
+
+// login user
+int login(){
+	string name,pass;
+	 cout << "                             *_________________________* "<<endl;
+        cout << "------------------------- | Enter Login Information | -------------------------------------------" << endl;
+        cout << "                          *-------------------------*"<<endl;
+	cout << "Enter username: ";
+	getline(cin >> ws,name);
+	inputPassword(pass);
+	int check = 0;
+	for(const User &user : users){
+		if(name == user.name && pass == user.password){
+		check = 1;		
+		break;
+		}
+	}
+	if(check == 1){
+		 cout << "                         *______________________________* "<<endl;
+        cout << "------------------------- | User Logged in Successfully! | -------------------------------------------" << endl;
+        cout << "                          *------------------------------*"<<endl;
+        return 1;
+	}else{
+		cout << "                          *_________________* "<<endl;
+        cout << "------------------------- | User Not Found! | -------------------------------------------" << endl;
+        cout << "                          *-----------------*"<<endl;
+        return -1;
+		}
+			
+}
+ //Employee management flow function
+ void system(){
+    EmployManager em;
+	em.loadData();
+    while(true){
+        int n = menu();
+
+        switch(n){
+            case 1: em.addEmployee(); break;
+            case 2: em.showEmployData(); break;
+            case 3: em.searchEmploy(); break;
+            case 4: em.deleteEmploy(); break;
+            case 5: em.updateEmploy(); break;
+            case 6:
+            	em.saveData();
+                cout << "\nThank you!\n";
+                return;
+            default:
+                cout << "\nInvalid choice!";
+        }
+    }
+ }
