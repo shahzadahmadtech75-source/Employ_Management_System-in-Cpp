@@ -6,7 +6,23 @@
 #include <algorithm>
 #include <cctype>
 #include <conio.h> 
+//colors library
+#include <windows.h>
+#ifndef COMMON_LVB_UNDERSCORE
+#define COMMON_LVB_UNDERSCORE 0x8000
+#endif
+#include "termcolor.hpp"
 using namespace std;
+// This is great for making colors work on Windows 10/11
+bool enableANSI() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return false;
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode)) return false;
+    dwMode |= 0x0004; // ENABLE_VIRTUAL_TERMINAL_PROCESSING
+    return SetConsoleMode(hOut, dwMode);
+}
+
 //check empty lines 
 		bool is_blank(const string& s) {
     
@@ -24,7 +40,7 @@ void load();
 // login User
 int login();
 // system flow function
-void system();
+void employeSystem();
 // User Class
 class User{
 	public:
@@ -53,7 +69,7 @@ public:
 	}
 	// set name by user input
     void setName(){
-        cout << "\nEnter Employee Name: ";
+        cout << termcolor::yellow << "\nEnter Employee Name: " << termcolor::reset;
         getline(cin >> ws, empName);
     }
     //get name
@@ -71,7 +87,7 @@ void setSalaryByPar(double n){
 }
 // set Salary by user Input
     void setSalary(){
-        cout << "\nEnter Employee Salary: ";
+        cout << termcolor::yellow << "\nEnter Employee Salary: " << termcolor::reset;
         cin >> empSalary;
     }
 	//GET SALARY
@@ -83,16 +99,17 @@ void setSalaryByPar(double n){
     }
 
     void displayEmployData() const{
-        cout << "\nName: " << empName;
-        cout << "\nID: " << empId;
-        cout << "\nSalary: " << empSalary;
-        cout << "\n-----------------------------------\n";
+        cout << termcolor::cyan << "\nName: " << termcolor::white << empName;
+        cout << termcolor::cyan << "\nID: "   << termcolor::white << empId;
+        cout << termcolor::cyan << "\nSalary: " << termcolor::green << empSalary;
+        cout << termcolor::bright_grey << "\n-----------------------------------\n" << termcolor::reset;
     }
 
     // Only update NAME and SALARY (not ID)
     void updateData(){
         int choice;
-        cout << "\n1. Update Name\n2. Update Salary\nEnter choice: ";
+        cout << termcolor::yellow << "\n1. Update Name\n2. Update Salary\n" << termcolor::reset;
+        cout << termcolor::yellow << "Enter choice: " << termcolor::reset;
         cin >> choice;
 
         switch(choice){
@@ -103,7 +120,7 @@ void setSalaryByPar(double n){
                 setSalary();
                 break;
             default:
-                cout << "\nInvalid choice!";
+                cout << termcolor::red << "\nInvalid choice!" << termcolor::reset;
         }
     }
 };
@@ -118,7 +135,7 @@ public:
 	void loadData(){
 		ifstream myfile("employList.txt");
 		if(!myfile.is_open()){
-			cout << "\nUnable to Open the File!";
+			cout << termcolor::red << "\nUnable to Open the File!" << termcolor::reset;
 			return;
 		}
 		employs.clear();
@@ -149,7 +166,7 @@ public:
 	void saveData(){
 		ofstream myfile("employList.txt");
 		if(!myfile.is_open()){
-			cout << "\nUnable to Open the File!";
+			cout << termcolor::red << "\nUnable to Open the File!" << termcolor::reset;
 			return;
 		}
 		for(Employee &employ : employs) {
@@ -159,13 +176,13 @@ public:
 			myfile << name << " | "<< id << " | "<< sal << endl;
 		}
 		myfile.close();
-		cout << "\nData Saved Successfully.";
+		cout << termcolor::green << termcolor::bold << "\nData Saved Successfully." << termcolor::reset;
 	}
 	
     bool idChecker(int x){
         for(Employee &employ : employs){
             if(x == employ.getId()){
-                cout << "\nID already exists!";
+                cout << termcolor::red << "\nID already exists!" << termcolor::reset;
                 return true;
             }
         }
@@ -178,7 +195,7 @@ public:
 
         int id;
         do{
-            cout << "\nEnter Employee ID: ";
+            cout << termcolor::yellow << "\nEnter Employee ID: " << termcolor::reset;
             cin >> id;
         } while(idChecker(id));
 
@@ -187,12 +204,12 @@ public:
 
         employs.push_back(em);
 
-        cout << "\nEmployee Added Successfully!\n";
+        cout << termcolor::green << termcolor::bold << "\nEmployee Added Successfully!\n" << termcolor::reset;
     }
 
     void showEmployData() const{
         if(employs.empty()){
-            cout << "\nNo Employees Found!\n";
+            cout << termcolor::red << "\nNo Employees Found!\n" << termcolor::reset;
             return;
         }
 
@@ -203,30 +220,30 @@ public:
 
     void searchEmploy(){
         int id;
-        cout << "\nEnter ID to search: ";
+        cout << termcolor::yellow << "\nEnter ID to search: " << termcolor::reset;
         cin >> id;
 
         for(const Employee &employ : employs){
             if(id == employ.getId()){
-                cout << "\nEmployee Found:\n";
+                cout << termcolor::green << termcolor::bold << "\nEmployee Found:\n" << termcolor::reset;
                 employ.displayEmployData();
                 return;
             }
         }
 
-        cout << "\nEmployee not found!\n";
+        cout << termcolor::red << "\nEmployee not found!\n" << termcolor::reset;
     }
 
     void updateEmploy(){
         int id;
-        cout << "\nEnter Employee ID to update: ";
+        cout << termcolor::yellow << "\nEnter Employee ID to update: " << termcolor::reset;
         cin >> id;
 
         for(Employee &employ : employs){
             if(id == employ.getId()){
 
                 int choice;
-                cout << "\n1. Update Name/Salary\n2. Update ID\nEnter choice: ";
+                cout << termcolor::yellow << "\n1. Update Name/Salary\n2. Update ID\nEnter choice: " << termcolor::reset;
                 cin >> choice;
 
                 if(choice == 1){
@@ -235,35 +252,35 @@ public:
                 else if(choice == 2){
                     int newId;
                     do{
-                        cout << "\nEnter New ID: ";
+                        cout << termcolor::yellow << "\nEnter New ID: " << termcolor::reset;
                         cin >> newId;
                     } while(idChecker(newId));
 
                     employ.setID(newId);
                 }
 
-                cout << "\nEmployee Updated Successfully!\n";
+                cout << termcolor::green << termcolor::bold << "\nEmployee Updated Successfully!\n" << termcolor::reset;
                 return;
             }
         }
 
-        cout << "\nEmployee not found!\n";
+        cout << termcolor::red << "\nEmployee not found!\n" << termcolor::reset;
     }
 
     void deleteEmploy(){
         int id;
-        cout << "\nEnter ID to delete: ";
+        cout << termcolor::yellow << "\nEnter ID to delete: " << termcolor::reset;
         cin >> id;
 
         for(auto i = employs.begin(); i != employs.end(); i++){
             if(id == i->getId()){
                 employs.erase(i);
-                cout << "\nEmployee Deleted Successfully!\n";
+                cout << termcolor::green << termcolor::bold << "\nEmployee Deleted Successfully!\n" << termcolor::reset;
                 return;
             }
         }
 
-        cout << "\nEmployee not found!\n";
+        cout << termcolor::red << "\nEmployee not found!\n" << termcolor::reset;
     }
 };
 
@@ -271,63 +288,98 @@ public:
 
 int menu(){
     int choice;
-    cout << "\n\n===== Employee Management System =====\n";
-    cout << "1. Add Employee\n2. Show Employees\n3. Search\n4. Delete\n5. Update\n6. Exit\n";
-    cout << "Enter choice: ";
+    cout << termcolor::bold <<  "\n\n===== Employee Management System =====\n\n" << termcolor::reset;
+    cout << termcolor::cyan << "1. Add Employee\n";
+    cout << "2. Show Employees\n";
+    cout << "3. Search\n";
+    cout << "4. Delete\n";
+    cout << "5. Update\n";
+    cout << termcolor::red << "6. Exit\n" << termcolor::reset;
+    cout << termcolor::yellow << "Enter choice: " << termcolor::reset;
     cin >> choice;
     return choice;
 }
 
 int main(){
+    enableANSI();
     load();
-    while (true)
-    {        
-        cout << "                          *_______________________________________* "<<endl;
-        cout << "------------------------- | Welcome to Employee Management System | -------------------------------------------" << endl;
-        cout << "                          *---------------------------------------*"<<endl;
+
+    while (true){
+        cout << termcolor::bold << termcolor::green;
+        cout << "                          *_______________________________________* " << endl;
+        cout << "------------------------- | Welcome to Employee Management System | ---------------------------------------" << endl;
+        cout << "                          *---------------------------------------*"  << endl;
+        cout << termcolor::reset;
+
         int choice;
+        cout << termcolor::cyan << termcolor::bold;
         cout << "1. Register" << endl;
-        cout << "2. Login" << endl;
-        cout << "3. Exit" << endl;
-        
-        cout << "Select: ";
-        cin >> choice;
-        int flag; 
-        switch (choice)
-        {
+        cout << "2. Login"    << endl;
+        cout << termcolor::red << "3. Exit"     << endl;
+        cout << termcolor::reset;
+        cout << termcolor::yellow << "Select: " << termcolor::reset;
+
+        // Safe input — prevents crash on bad input
+        if (!(cin >> choice)) { 
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << termcolor::red << "\nInvalid input! Enter a number.\n" << termcolor::reset;
+            continue;
+        }
+
+
+        switch (choice){
             case 1:
-            registerUser() ;
-             system();
-            break;
-            case 2:
-            flag = login();
-                if(flag == 1){
-                    system();
-                }else{
-                    registerUser();
-                    system();
+                registerUser();
+                employeSystem(); 
+
+                break;
+
+            case 2: {
+                // FIXED: login failure now gives a real choice  FIXED
+                int flag = login();
+                if (flag == 1){
+                    employeSystem();
+                } else {
+                    cout << termcolor::yellow << termcolor::bold;
+                    cout << "\n1. Try Login Again\n2. Register New Account\n3. Back to Main Menu\n";
+                    cout << termcolor::reset;
+                    cout << termcolor::yellow << "Select: " << termcolor::reset;
+                    int sub;
+                    cin >> sub;
+                    if (sub == 1){
+                        flag = login();
+                        if(flag == 1) employeSystem();
+                    } else if (sub == 2){
+                        registerUser();
+                        employeSystem();
+                    }
+                    // case 3 or anything else ? loops back to main menu
                 }
-            break;
+
+                break;
+            }
+
             case 3:
-            cout << "                          *_______________________* "<<endl;
-            cout << "------------------------- | Thanks for visiting.. | -------------------------------------------" << endl;
-            cout << "                          *-----------------------*"<<endl;
-        
-        return 0;
-    default:
-        cout << "\nInvalid Choice.. !" << endl;
-        continue;
+                cout << termcolor::bold << termcolor::magenta;
+                cout << "                          *________________________* "  << endl;
+                cout << "------------------------- | Thanks for visiting..  | ---------------------------------------------------" << endl;
+                cout << "                          *-----------------------*"   << endl;
+                cout << termcolor::reset;
+                return 0;
+
+            default:
+                cout << termcolor::red << "\nInvalid Choice.. !\n" << termcolor::reset;
+                continue;
+        }
     }
 }
-    
-}
-
 //Password Function
 void inputPassword(string &password) {
     char ch;
     password.clear();  // clear previous data
 
-    cout << "\nEnter Password (masking enabled): ";
+    cout << termcolor::yellow << "\nEnter Password (masking enabled): " << termcolor::reset;
 
     while (true) {
         ch = _getch();
@@ -343,7 +395,7 @@ void inputPassword(string &password) {
         }
         else {
             password.push_back(ch);
-            cout << "*";
+            cout << termcolor::bright_grey << "*" << termcolor::reset;
         }
     }
 
@@ -366,16 +418,16 @@ void save(){
 void registerUser() {
     User u;  // ? create object first
 
-    cout << "\n************************************* Register a new User.. ************************************************\n";
+    cout << termcolor::bold << termcolor::magenta << "\n************************************* Register a new User.. ************************************************\n" << termcolor::reset;
 	string name;
 	
     while(true){	
     bool exists = false;
-    cout << "\nEnter Username: ";
+    cout << termcolor::yellow << "\nEnter Username: " << termcolor::reset;
     getline(cin >> ws, name);   // input into object
     for(const User &user : users){
     	if(name == user.name){
-    		cout << "\nUser already exists!...." <<endl;
+    		cout << termcolor::red << "\nUser already exists!...." << termcolor::reset <<endl;
 			exists = true;
 			break;
 		}
@@ -391,11 +443,13 @@ void registerUser() {
     inputPassword(u.password);    // input password
 
     users.push_back(u);           // ? store in vector
-     cout << "                             *_______________________________* "<<endl;
-        cout << "------------------------- | User Registered Successfully! | ------------------------------------" << endl;
-        cout << "                          *-------------------------------*"<<endl;
+    cout << termcolor::bold << termcolor::green;
+    cout << "                          *_______________________________* "<<endl;
+    cout << "------------------------- | User Registered Successfully! | ------------------------------------" << endl;
+    cout << "                          *-------------------------------*"<<endl;
+    cout << termcolor::reset;
     
- 	save()   ;
+ 	save();
 }
 
 // load users from file to vector
@@ -435,10 +489,12 @@ void load() {
 // login user
 int login(){
 	string name,pass;
-	 cout << "                             *_________________________* "<<endl;
-        cout << "------------------------- | Enter Login Information | -------------------------------------------" << endl;
-        cout << "                          *-------------------------*"<<endl;
-	cout << "Enter username: ";
+	cout << termcolor::bold;
+	cout << "                          *_________________________* "<<endl;
+    cout << "------------------------- | Enter Login Information | -------------------------------------------" << endl;
+    cout << "                          *-------------------------*"<<endl;
+    cout << termcolor::reset;
+	cout << termcolor::yellow << "Enter username: " << termcolor::reset;
 	getline(cin >> ws,name);
 	inputPassword(pass);
 	int check = 0;
@@ -449,20 +505,24 @@ int login(){
 		}
 	}
 	if(check == 1){
-		 cout << "                         *______________________________* "<<endl;
+		cout << termcolor::bold << termcolor::green;
+		cout << "                          *______________________________* "<<endl;
         cout << "------------------------- | User Logged in Successfully! | -------------------------------------------" << endl;
         cout << "                          *------------------------------*"<<endl;
+        cout << termcolor::reset;
         return 1;
 	}else{
+		cout << termcolor::bold << termcolor::red;
 		cout << "                          *_________________* "<<endl;
         cout << "------------------------- | User Not Found! | -------------------------------------------" << endl;
         cout << "                          *-----------------*"<<endl;
+        cout << termcolor::reset;
         return -1;
 		}
 			
 }
  //Employee management flow function
- void system(){
+ void employeSystem(){
     EmployManager em;
 	em.loadData();
     while(true){
@@ -476,10 +536,10 @@ int login(){
             case 5: em.updateEmploy(); break;
             case 6:
             	em.saveData();
-                cout << "\nThank you!\n";
+                cout << termcolor::bold << termcolor::magenta << "\nThank you!\n" << termcolor::reset;
                 return;
             default:
-                cout << "\nInvalid choice!";
+                cout << termcolor::red << "\nInvalid choice!" << termcolor::reset;
         }
     }
  }
