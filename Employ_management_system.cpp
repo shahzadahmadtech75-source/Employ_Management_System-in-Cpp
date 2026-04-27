@@ -41,6 +41,8 @@ void load();
 int login();
 // system flow function
 void employeSystem();
+//username validation function
+bool isValidUsername(string username);
 // User Class
 class User{
 	public:
@@ -423,8 +425,11 @@ void registerUser() {
 	
     while(true){	
     bool exists = false;
-    cout << termcolor::yellow << "\nEnter Username: " << termcolor::reset;
-    getline(cin >> ws, name);   // input into object
+//    check validation
+    do {
+        cout << termcolor::yellow<<"Enter Username (min 5 chars, not pure numbers): " << termcolor::reset;
+        getline(cin >> ws , name);
+    } while (!isValidUsername(name));
     for(const User &user : users){
     	if(name == user.name){
     		cout << termcolor::red << "\nUser already exists!...." << termcolor::reset <<endl;
@@ -543,3 +548,35 @@ int login(){
         }
     }
  }
+ 
+ 
+ 
+ 
+ 
+// validation of username and password
+
+// ? CHECK 1: Username Validator
+bool isValidUsername(string username) {
+    
+    if (username.length() < 5) {
+        cout << "? Username too short! Must be at least 5 characters.\n\n";
+        return false;
+    }
+
+    
+    bool hasLetter = false;
+    for (char ch : username) {
+        if (isalpha(ch)) {  // isalpha() checks if character is a letter
+            hasLetter = true;
+            break;
+        }
+    }
+
+    if (!hasLetter) {
+        cout << "? Username cannot be purely numbers! Must contain at least one letter.\n";
+        return false;
+    }
+
+    return true;
+}
+
